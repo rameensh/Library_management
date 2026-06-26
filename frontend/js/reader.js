@@ -125,5 +125,75 @@ async function initReader() {
     );
   }
 }
+// Add to reader.js - near the top
+async function initReader() {
+  if (!bookId) {
+    setStatus("No book selected. Go back to the catalogue and pick one.", true);
+    return;
+  }
+  backLink.href = `book.html?id=${bookId}`;
 
+  try {
+    const book = await BooksAPI.getBook(bookId);
+    titleEl.textContent = book.title;
+    document.title = `${book.title} — Reading`;
+    
+    // ─── NEW: Apply genre-based theme ───
+    if (book.genre) {
+      // Store book data for theme manager
+      sessionStorage.setItem('current_book', JSON.stringify(book));
+      
+      // Apply theme based on genre
+      ThemeManager.applyGenreTheme(book.genre);
+      
+      // Show genre badge in reader
+      const genreBadge = document.createElement('div');
+      genreBadge.className = 'genre-badge';
+      genreBadge.textContent = `📖 ${book.genre}`;
+      genreBadge.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 100;
+        font-family: var(--font-ui);
+        font-size: 0.72rem;
+        padding: 6px 14px;
+        border-radius: 999px;
+        background: var(--accent-color);
+        color: var(--bg-primary);
+        opacity: 0.8;
+        pointer-events: none;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      `;
+      document.body.appendChild(genreBadge);
+    }
+
+    if (!book.has_pdf || !book.pdf_url) {
+      setStatus("This book doesn't have a PDF edition.", true);
+      return;
+    }
+
+    setStatus("Loading PDF…");
+
+    pdfDoc = await pdfjsLib.getDocument(book.pdf_url).promise;
+    setStatus("");
+
+    const saved = getPdfProgress(bookId);
+    const startPage = saved && saved.page ? Math.min(saved.page, pdfDoc.numPages) : 1;
+
+    goToPage(startPage);
+
+    if (saved && saved.page > 1) {
+      setStatus(`Resuming from page ${startPage} of ${pdfDoc.numPages}.`);
+      setTimeout(() => setStatus(""), 3000);
+    }
+  } catch (err) {
+    console.error(err);
+    setStatus(
+      `Couldn't load this PDF. This usually means the file URL isn't a real hosted file yet, or it doesn't allow cross-origin (CORS) access from this site. (${err.message})`,
+      true
+    );
+  }
+}
 document.addEventListener("DOMContentLoaded", initReader);

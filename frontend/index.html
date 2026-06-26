@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Crimson+Pro:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/themes.css">
 </head>
 <body>
 
@@ -24,6 +25,7 @@
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input type="search" placeholder="Search titles, authors…" aria-label="Search the catalogue">
       </form>
+      <div id="theme-controls" style="display:flex;align-items:center;gap:12px;margin-left:16px;"></div>
     </nav>
   </div>
 </header>
@@ -75,15 +77,14 @@
 <script>
   // Wait for DOM to load, then update nav and render shelves
   document.addEventListener("DOMContentLoaded", function() {
-    console.log("DOM loaded - updating nav");
     updateNavForAuth();
     
-    // Also make sure shelves are rendered
-    if (typeof renderShelves === 'function') {
-      console.log("Rendering shelves...");
-      renderShelves();
-    } else {
-      console.error("renderShelves function not found!");
+    const container = document.getElementById('theme-controls');
+    if (container && typeof getThemeToggleHTML === 'function') {
+      container.innerHTML = getThemeToggleHTML();
+      if (typeof ThemeManager !== 'undefined' && ThemeManager) {
+        ThemeManager.init();
+      }
     }
   });
 </script>

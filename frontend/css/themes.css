@@ -1,0 +1,258 @@
+/* ============================================================
+   THEME SYSTEM - Genre-based reading themes
+   ============================================================ */
+
+/* ── Base theme variables ── */
+:root {
+  /* Default light theme */
+  --bg-primary: #F7F3EC;
+  --bg-secondary: #EFE9DD;
+  --bg-card: #FFFFFF;
+  --bg-input: #FFFFFF;
+  --text-primary: #2A2620;
+  --text-secondary: #5A5448;
+  --text-muted: #8B9BB4;
+  --border-color: rgba(13, 17, 23, 0.1);
+  --shadow-color: rgba(13, 17, 23, 0.12);
+  --accent-color: #D4A843;
+  --accent-hover: #E8C97A;
+  
+  /* Reader specific */
+  --reader-bg: #F7F3EC;
+  --reader-text: #2A2620;
+  --reader-page-shadow: rgba(13, 17, 23, 0.18);
+}
+
+/* ── Dark base theme ── */
+[data-theme="dark"] {
+  --bg-primary: #1a1a2e;
+  --bg-secondary: #16213e;
+  --bg-card: #1e2a4a;
+  --bg-input: #1a1a2e;
+  --text-primary: #e0e0e0;
+  --text-secondary: #b0b0b0;
+  --text-muted: #6b7b8b;
+  --border-color: rgba(255, 255, 255, 0.08);
+  --shadow-color: rgba(0, 0, 0, 0.3);
+  --accent-color: #6C63FF;
+  --accent-hover: #7B73FF;
+  
+  --reader-bg: #1a1a2e;
+  --reader-text: #e0e0e0;
+  --reader-page-shadow: rgba(0, 0, 0, 0.5);
+}
+
+/* ── GENRE-BASED THEMES ── */
+
+/* 🎭 Fiction - Warm, cozy, inviting */
+[data-theme="fiction"] {
+  --bg-primary: #FDF6F0;
+  --bg-secondary: #F5EAE0;
+  --bg-card: #FFFFFF;
+  --bg-input: #FFFFFF;
+  --text-primary: #3D2C1A;
+  --text-secondary: #6B5340;
+  --text-muted: #A68B7A;
+  --border-color: rgba(61, 44, 26, 0.12);
+  --shadow-color: rgba(61, 44, 26, 0.10);
+  --accent-color: #C27A4A;
+  --accent-hover: #D48E5A;
+  
+  --reader-bg: #FDF6F0;
+  --reader-text: #3D2C1A;
+  --reader-page-shadow: rgba(61, 44, 26, 0.15);
+}
+
+/* 🔥 Motivational - Energetic, vibrant */
+[data-theme="motivational"] {
+  --bg-primary: #FFF8F0;
+  --bg-secondary: #FFEFE0;
+  --bg-card: #FFFFFF;
+  --bg-input: #FFFFFF;
+  --text-primary: #1A2B3C;
+  --text-secondary: #4A5B6C;
+  --text-muted: #8A9BAA;
+  --border-color: rgba(26, 43, 60, 0.10);
+  --shadow-color: rgba(212, 168, 67, 0.15);
+  --accent-color: #FF6B35;
+  --accent-hover: #FF7A4A;
+  
+  --reader-bg: #FFF8F0;
+  --reader-text: #1A2B3C;
+  --reader-page-shadow: rgba(255, 107, 53, 0.15);
+}
+
+/* 🔍 Mystery - Dark, moody, suspenseful */
+[data-theme="mystery"] {
+  --bg-primary: #1A1A2E;
+  --bg-secondary: #16213E;
+  --bg-card: #1E2A4A;
+  --bg-input: #1A1A2E;
+  --text-primary: #E8E0D8;
+  --text-secondary: #A8A0A0;
+  --text-muted: #6B6B7B;
+  --border-color: rgba(255, 255, 255, 0.08);
+  --shadow-color: rgba(0, 0, 0, 0.4);
+  --accent-color: #A855F7;
+  --accent-hover: #B86AFF;
+  
+  --reader-bg: #1A1A2E;
+  --reader-text: #E8E0D8;
+  --reader-page-shadow: rgba(168, 85, 247, 0.15);
+}
+
+/* 🧪 Science - Clean, clinical, modern */
+[data-theme="science"] {
+  --bg-primary: #F0F5F8;
+  --bg-secondary: #E4EDF2;
+  --bg-card: #FFFFFF;
+  --bg-input: #FFFFFF;
+  --text-primary: #1A2B3C;
+  --text-secondary: #4A6B7C;
+  --text-muted: #8A9BAA;
+  --border-color: rgba(26, 43, 60, 0.08);
+  --shadow-color: rgba(26, 43, 60, 0.08);
+  --accent-color: #2A7DE1;
+  --accent-hover: #3A8DF1;
+  
+  --reader-bg: #F0F5F8;
+  --reader-text: #1A2B3C;
+  --reader-page-shadow: rgba(42, 125, 225, 0.12);
+}
+
+/* 📖 Biography - Classic, timeless, elegant */
+[data-theme="biography"] {
+  --bg-primary: #F5F0EB;
+  --bg-secondary: #EBE4DC;
+  --bg-card: #FFFFFF;
+  --bg-input: #FFFFFF;
+  --text-primary: #2A2218;
+  --text-secondary: #5A4A3A;
+  --text-muted: #8A7A6A;
+  --border-color: rgba(42, 34, 24, 0.10);
+  --shadow-color: rgba(42, 34, 24, 0.08);
+  --accent-color: #8B6B4A;
+  --accent-hover: #9B7B5A;
+  
+  --reader-bg: #F5F0EB;
+  --reader-text: #2A2218;
+  --reader-page-shadow: rgba(139, 107, 74, 0.12);
+}
+
+/* 💪 Self-help - Calm, grounded, natural */
+[data-theme="self-help"] {
+  --bg-primary: #F5F8F0;
+  --bg-secondary: #E8EDE0;
+  --bg-card: #FFFFFF;
+  --bg-input: #FFFFFF;
+  --text-primary: #1A2A1A;
+  --text-secondary: #4A5A4A;
+  --text-muted: #8A9A8A;
+  --border-color: rgba(26, 42, 26, 0.08);
+  --shadow-color: rgba(26, 42, 26, 0.08);
+  --accent-color: #4A8C6A;
+  --accent-hover: #5A9C7A;
+  
+  --reader-bg: #F5F8F0;
+  --reader-text: #1A2A1A;
+  --reader-page-shadow: rgba(74, 140, 106, 0.12);
+}
+
+/* 🌟 Default fallback - Warm, inviting */
+[data-theme="default"] {
+  --bg-primary: #F7F3EC;
+  --bg-secondary: #EFE9DD;
+  --bg-card: #FFFFFF;
+  --bg-input: #FFFFFF;
+  --text-primary: #2A2620;
+  --text-secondary: #5A5448;
+  --text-muted: #8B9BB4;
+  --border-color: rgba(13, 17, 23, 0.10);
+  --shadow-color: rgba(13, 17, 23, 0.10);
+  --accent-color: #D4A843;
+  --accent-hover: #E8C97A;
+  
+  --reader-bg: #F7F3EC;
+  --reader-text: #2A2620;
+  --reader-page-shadow: rgba(13, 17, 23, 0.12);
+}
+
+/* ── Apply theme colors ── */
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+/* Cards, inputs, containers */
+.card, .format-card, .avail-card, .stat-chip {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+input, select, textarea {
+  background: var(--bg-input);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+/* Reader specific */
+.reader-main {
+  background: var(--reader-bg);
+  color: var(--reader-text);
+}
+
+.canvas-wrap {
+  box-shadow: 0 0 80px var(--reader-page-shadow);
+}
+
+/* Smooth transitions for all themed elements */
+* {
+  transition: background-color 0.4s ease, 
+              color 0.4s ease, 
+              border-color 0.4s ease, 
+              box-shadow 0.4s ease;
+}
+
+/* ── Theme toggle button ── */
+.theme-toggle-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 8px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.theme-toggle-btn:hover {
+  border-color: var(--accent-color);
+  background: var(--bg-secondary);
+}
+
+/* Theme controls container */
+.theme-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: 16px;
+}
+
+/* Genre badge in reader */
+.genre-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-family: var(--font-ui);
+  background: var(--accent-color);
+  color: var(--bg-primary);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}

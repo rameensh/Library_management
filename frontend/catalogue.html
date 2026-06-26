@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Crimson+Pro:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/themes.css">
 </head>
 <body>
 
@@ -58,5 +59,17 @@
 
 <script src="js/api.js"></script>
 <script src="js/catalogue.js"></script>
+<script src="js/themes.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Add theme controls to nav
+    const controlsContainer = document.getElementById('theme-controls');
+    if (controlsContainer) {
+      controlsContainer.innerHTML = getThemeToggleHTML();
+      // Re-initialize theme manager after adding controls
+      ThemeManager.init();
+    }
+  });
+</script>
 </body>
 </html>
