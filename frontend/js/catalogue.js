@@ -100,6 +100,111 @@ function renderSkeletons() {
     .join("");
 }
 
+// ─── Get User Helper ────────────────────────────────────────────────────────
+
+function getUser() {
+  try {
+    const raw = localStorage.getItem('bibliotheca:user');
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+// ─── Quick Borrow Function (MAKE IT GLOBAL) ──────────────────────────────────
+
+// DO NOT redeclare API_BASE_URL here - it's already in api.js
+// Just use the existing one
+
+// Define as a global function so onclick can find it
+window.quickBorrow = async function(bookId, bookTitle) {
+  console.log("quickBorrow called for:", bookTitle, bookId);
+  
+  const token = localStorage.getItem('bibliotheca:token');
+  console.log("Token:", token ? "Present" : "Missing");
+  
+  if (!token) {
+    alert('Please sign in first!');
+    window.location.href = 'login.html';
+    return;
+  }
+  
+  if (!confirm(`Borrow "${bookTitle}"?\n\nYou'll have 14 days to return it.`)) return;
+  
+  try {
+    console.log(" Sending borrow request to:", `${API_BASE_URL}/api/book_inventory/borrow`);
+    const res = await fetch(`${API_BASE_URL}/api/book_inventory/borrow`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ book_id: bookId })
+    });
+    
+    const data = await res.json();
+    console.log("🔵 Response:", data);
+    
+    if (!res.ok) {
+      throw new Error(data.detail || 'Borrow failed');
+    }
+    
+    alert(` "${bookTitle}" borrowed successfully!\n\nDue date: ${new Date(data.due_date).toLocaleDateString()}`);
+    window.location.reload();
+  } catch(err) {
+    console.error("Borrow error:", err);
+    alert('❌ ' + err.message);
+  }
+};
+
+// ─── UPDATED: bookCardHTML with Borrow Button ──────────────────────────────
+
+function bookCardHTML(book) {
+  const cover = book.cover_url || placeholderCover(book.title);
+  const hasAvailable = book.has_hardcopy && book.hardcopy_available > 0;
+  const user = getUser();
+  
+  // Escape the book title for safe use in onclick
+  const safeTitle = escapeHTML(book.title);
+  
+  let borrowButton = '';
+  if (hasAvailable && user) {
+    borrowButton = `
+      <button class="btn btn-amber" style="margin-top:8px;width:100%;padding:6px;font-size:0.75rem;border-radius:4px;cursor:pointer;" 
+              onclick="event.stopPropagation(); window.quickBorrow('${book.id}', '${safeTitle}')">
+         Borrow
+      </button>
+    `;
+  } else if (hasAvailable && !user) {
+    borrowButton = `
+      <a href="login.html" class="btn btn-ghost" style="margin-top:8px;width:100%;padding:6px;font-size:0.75rem;text-align:center;display:block;border:1px solid var(--paper-line);border-radius:4px;color:var(--ink-soft);text-decoration:none;">
+         Sign in to borrow
+      </a>
+    `;
+  } else {
+    borrowButton = `
+      <button class="btn btn-ghost" style="margin-top:8px;width:100%;padding:6px;font-size:0.75rem;border-radius:4px;cursor:not-allowed;opacity:0.5;border:1px solid var(--paper-line);" disabled>
+         Unavailable
+      </button>
+    `;
+  }
+  
+  return `
+    <div class="book-card-wrapper" style="display:flex;flex-direction:column;height:100%;">
+      <a class="book-card" href="book.html?id=${book.id}" style="flex:1;display:block;">
+        <img class="book-cover" src="${cover}" alt="Cover of ${escapeHTML(book.title)}" loading="lazy"
+             onerror="this.src='${placeholderCover(book.title)}'">
+        <h4>${escapeHTML(book.title)}</h4>
+        <p class="author">${escapeHTML(book.author)}</p>
+        <div class="badges">${formatBadges(book)}</div>
+      </a>
+      ${borrowButton}
+    </div>
+  `;
+}
+
+// ─── Load Results ───────────────────────────────────────────────────────────
+
 async function loadResults() {
   const grid = document.getElementById("results-grid");
   const meta = document.getElementById("results-meta");
@@ -153,7 +258,10 @@ async function loadResults() {
   }
 }
 
+// ─── Initialize ─────────────────────────────────────────────────────────────
+
 document.addEventListener("DOMContentLoaded", () => {
+  console.log("🔵 Catalogue.js loaded");
   readStateFromURL();
   wireSearchInput();
   wireFormatPills();
