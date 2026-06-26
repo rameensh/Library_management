@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reading — Bibliotheca</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Crimson+Pro:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+</head>
+<body class="reader-page">
+
+<header class="site-header">
+  <div class="container">
+    <a href="index.html" class="wordmark">Bibliotheca<span>.</span></a>
+    <nav class="site-nav">
+      <a href="index.html">Home</a>
+      <a href="catalogue.html">Catalogue</a>
+    </nav>
+  </div>
+</header>
+
+<div class="reader-toolbar">
+  <div class="container reader-toolbar-inner">
+    <a id="reader-back" href="catalogue.html" class="reader-back">← Back to book</a>
+    <span class="reader-title" id="reader-title">Loading…</span>
+    <div class="reader-controls">
+      <button id="zoom-out" class="reader-btn" title="Zoom out">−</button>
+      <button id="zoom-in" class="reader-btn" title="Zoom in">+</button>
+      <button id="prev-page" class="reader-btn">‹ Prev</button>
+      <span id="page-indicator">– / –</span>
+      <button id="next-page" class="reader-btn">Next ›</button>
+    </div>
+  </div>
+  <div class="reader-progress-track">
+    <div class="reader-progress-fill" id="reader-progress-fill"></div>
+  </div>
+</div>
+
+<main class="reader-main">
+  <p id="reader-status" class="reader-status"></p>
+  <div id="canvas-wrap" class="canvas-wrap">
+    <canvas id="pdf-canvas"></canvas>
+  </div>
+</main>
+
+<script src="js/api.js"></script>
+<script src="js/progress.js"></script>
+<script src="js/reader.js"></script>
+</body>
+</html>

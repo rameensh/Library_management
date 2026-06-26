@@ -1,0 +1,1017 @@
+/* ==========================================================================
+   Bibliotheca — design tokens
+   ========================================================================== */
+
+:root {
+  --midnight: #0D1117;
+  --midnight-raised: #161B22;
+  --vellum: #F7F3EC;
+  --vellum-raised: #EFE9DD;
+  --amber: #D4A843;
+  --amber-soft: #E8C97A;
+  --terracotta: #C4614A;
+  --forest: #2D4A3E;
+  --slate: #8B9BB4;
+
+  --ink: #2A2620;           /* body text on vellum */
+  --ink-soft: #5A5448;
+  --paper-line: rgba(13, 17, 23, 0.1);
+  --night-line: rgba(247, 243, 236, 0.12);
+
+  --font-display: "DM Serif Display", Georgia, serif;
+  --font-body: "Crimson Pro", Georgia, serif;
+  --font-ui: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+
+  --shadow-card: 0 6px 18px rgba(13, 17, 23, 0.12);
+  --shadow-card-dark: 0 10px 30px rgba(0, 0, 0, 0.45);
+
+  --container: 1180px;
+}
+
+/* ==========================================================================
+   Reset
+   ========================================================================== */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--vellum);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 18px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+img { max-width: 100%; display: block; }
+a { color: inherit; text-decoration: none; }
+button { font-family: var(--font-ui); cursor: pointer; }
+ul { margin: 0; padding: 0; list-style: none; }
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  margin: 0;
+}
+
+:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 3px;
+}
+
+.eyebrow {
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--slate);
+}
+
+.container {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 28px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ==========================================================================
+   Header — the spine: stays dark across every room of the library
+   ========================================================================== */
+
+.site-header {
+  background: var(--midnight);
+  border-bottom: 1px solid var(--night-line);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.site-header .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 68px;
+}
+
+.wordmark {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  color: var(--vellum);
+  letter-spacing: 0.01em;
+}
+.wordmark span { color: var(--amber); }
+
+.site-nav { display: flex; align-items: center; gap: 28px; }
+
+.site-nav a {
+  font-family: var(--font-ui);
+  font-size: 0.88rem;
+  color: var(--slate);
+  transition: color 0.2s ease;
+}
+.site-nav a:hover,
+.site-nav a[aria-current="page"] { color: var(--vellum); }
+
+.nav-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--midnight-raised);
+  border: 1px solid var(--night-line);
+  border-radius: 999px;
+  padding: 7px 14px;
+}
+.nav-search input {
+  background: transparent;
+  border: none;
+  color: var(--vellum);
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  width: 160px;
+}
+.nav-search input::placeholder { color: var(--slate); }
+.nav-search input:focus { outline: none; }
+.nav-search svg { flex-shrink: 0; color: var(--slate); }
+
+/* ==========================================================================
+   Hero — the reading lamp
+   ========================================================================== */
+
+.hero {
+  position: relative;
+  background: var(--midnight);
+  overflow: hidden;
+  padding: 110px 0 130px;
+}
+
+/* the lamplight bloom: a warm radial glow seated above the headline */
+.lamp-glow {
+  position: absolute;
+  top: -180px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 900px;
+  height: 700px;
+  background: radial-gradient(
+    circle at 50% 35%,
+    rgba(212, 168, 67, 0.55) 0%,
+    rgba(212, 168, 67, 0.22) 28%,
+    rgba(212, 168, 67, 0.07) 48%,
+    rgba(13, 17, 23, 0) 70%
+  );
+  filter: blur(4px);
+  pointer-events: none;
+  animation: lamp-flicker 7s ease-in-out infinite;
+}
+
+@keyframes lamp-flicker {
+  0%, 100% { opacity: 1; }
+  45% { opacity: 0.92; }
+  50% { opacity: 1; }
+  78% { opacity: 0.96; }
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 700px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.hero .eyebrow { display: block; margin-bottom: 18px; }
+
+.hero h1 {
+  font-size: clamp(2.6rem, 5.5vw, 4.4rem);
+  color: var(--vellum);
+  line-height: 1.08;
+  text-shadow: 0 0 60px rgba(212, 168, 67, 0.35);
+}
+
+.hero h1 em {
+  font-style: italic;
+  color: var(--amber-soft);
+}
+
+.hero p.lede {
+  font-family: var(--font-body);
+  font-size: 1.2rem;
+  color: var(--slate);
+  margin: 24px auto 0;
+  max-width: 540px;
+}
+
+.hero-actions {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 38px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  font-family: var(--font-ui);
+  font-size: 0.92rem;
+  font-weight: 500;
+  padding: 13px 26px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: transform 0.15s ease, background 0.2s ease, border-color 0.2s ease;
+}
+.btn:hover { transform: translateY(-1px); }
+
+.btn-amber {
+  background: var(--amber);
+  color: var(--midnight);
+}
+.btn-amber:hover { background: var(--amber-soft); }
+
+.btn-ghost {
+  background: transparent;
+  border-color: var(--night-line);
+  color: var(--vellum);
+}
+.btn-ghost:hover { border-color: var(--amber); }
+
+.btn-outline {
+  background: transparent;
+  border-color: var(--ink);
+  color: var(--ink);
+}
+.btn-outline:hover { border-color: var(--forest); color: var(--forest); }
+
+.btn[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.hero-stat {
+  margin-top: 46px;
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  color: var(--slate);
+}
+.hero-stat strong { color: var(--amber-soft); font-weight: 600; }
+
+/* ==========================================================================
+   Shelves — light catalogue section
+   ========================================================================== */
+
+.shelves {
+  background: var(--vellum);
+  padding: 80px 0 100px;
+}
+
+.shelves-intro {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 48px;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.shelves-intro h2 {
+  font-size: 2.1rem;
+  color: var(--ink);
+}
+
+.shelves-intro p {
+  font-family: var(--font-ui);
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+  max-width: 360px;
+}
+
+.shelf { margin-bottom: 56px; }
+
+.shelf-label {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--paper-line);
+}
+
+.shelf-label h3 {
+  font-size: 1.4rem;
+  color: var(--forest);
+}
+
+.shelf-count {
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  color: var(--slate);
+}
+
+.shelf-row {
+  display: flex;
+  gap: 22px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+  scroll-snap-type: x proximity;
+}
+.shelf-row::-webkit-scrollbar { height: 6px; }
+.shelf-row::-webkit-scrollbar-thumb { background: var(--paper-line); border-radius: 3px; }
+
+/* ==========================================================================
+   Book card
+   ========================================================================== */
+
+.book-card {
+  flex: 0 0 170px;
+  scroll-snap-align: start;
+  display: block;
+}
+
+.book-cover {
+  width: 170px;
+  height: 248px;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+  background: var(--vellum-raised) linear-gradient(160deg, #E3DCCB, #D8CFB8);
+  box-shadow: var(--shadow-card);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.book-card:hover .book-cover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 26px rgba(13, 17, 23, 0.18);
+}
+
+.book-card h4 {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 1rem;
+  margin: 12px 0 2px;
+  color: var(--ink);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.book-card .author {
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+}
+
+.badges { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+
+.badge {
+  font-family: var(--font-ui);
+  font-size: 0.66rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 3px 7px;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+}
+.badge-pdf { color: var(--forest); }
+.badge-audio { color: var(--terracotta); }
+.badge-hardcopy { color: var(--slate); }
+.badge-hardcopy.is-out { color: #B0492F; }
+
+/* ==========================================================================
+   Footer — closing the book
+   ========================================================================== */
+
+.site-footer {
+  background: var(--midnight);
+  color: var(--slate);
+  padding: 48px 0;
+  border-top: 1px solid var(--night-line);
+}
+
+.site-footer .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.site-footer .wordmark { font-size: 1.1rem; }
+
+.site-footer small {
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+}
+
+/* ==========================================================================
+   Catalogue page
+   ========================================================================== */
+
+.catalogue-header {
+  background: var(--vellum-raised);
+  padding: 56px 0 36px;
+  border-bottom: 1px solid var(--paper-line);
+}
+
+.catalogue-header h1 {
+  font-size: 2.4rem;
+  color: var(--ink);
+}
+
+.catalogue-header p {
+  font-family: var(--font-ui);
+  color: var(--ink-soft);
+  margin-top: 10px;
+  max-width: 520px;
+}
+
+.filters {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 28px;
+}
+
+.filters input[type="search"] {
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  padding: 11px 16px;
+  border: 1px solid var(--paper-line);
+  border-radius: var(--radius-sm);
+  background: var(--vellum);
+  color: var(--ink);
+  min-width: 220px;
+}
+.filters input[type="search"]:focus { outline: none; border-color: var(--amber); }
+
+.pill {
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--paper-line);
+  background: var(--vellum);
+  color: var(--ink-soft);
+  transition: all 0.15s ease;
+}
+.pill:hover { border-color: var(--forest); color: var(--forest); }
+.pill.is-active {
+  background: var(--forest);
+  border-color: var(--forest);
+  color: var(--vellum);
+}
+
+.catalogue-body { padding: 44px 0 90px; }
+
+.catalogue-meta {
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  margin-bottom: 24px;
+}
+
+.catalogue-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 30px 22px;
+}
+
+.empty-state, .error-state {
+  font-family: var(--font-ui);
+  color: var(--ink-soft);
+  padding: 60px 0;
+  text-align: center;
+}
+.error-state { color: var(--terracotta); }
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 18px;
+  margin-top: 50px;
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--vellum-raised) 25%, #E6DFCD 37%, var(--vellum-raised) 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+  border-radius: var(--radius-sm);
+}
+@keyframes shimmer { 0% { background-position: 100% 0; } 100% { background-position: 0 0; } }
+.skeleton-card { width: 170px; height: 248px; }
+
+/* ==========================================================================
+   Book detail page
+   ========================================================================== */
+
+.detail-hero {
+  background: var(--vellum-raised);
+  padding: 56px 0 64px;
+  border-bottom: 1px solid var(--paper-line);
+}
+
+.detail-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 48px;
+}
+
+.detail-cover {
+  width: 100%;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+}
+
+.detail-genre {
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--forest);
+}
+
+.detail-layout h1 {
+  font-size: 2.6rem;
+  color: var(--ink);
+  margin-top: 10px;
+  line-height: 1.12;
+}
+
+.detail-author {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 1.15rem;
+  color: var(--ink-soft);
+  margin-top: 8px;
+}
+
+.detail-meta-row {
+  display: flex;
+  gap: 18px;
+  margin-top: 18px;
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+  color: var(--slate);
+  flex-wrap: wrap;
+}
+
+.detail-desc {
+  margin-top: 26px;
+  font-size: 1.08rem;
+  color: var(--ink);
+  max-width: 60ch;
+}
+
+.format-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 34px;
+}
+
+.format-card {
+  border: 1px solid var(--paper-line);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  background: var(--vellum);
+}
+.format-card.is-unavailable { opacity: 0.55; }
+
+.format-card .eyebrow { margin-bottom: 6px; }
+
+.format-card h4 {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: var(--ink);
+}
+
+.format-card p {
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  margin: 6px 0 14px;
+}
+
+.detail-body { padding: 56px 0 100px; }
+
+.detail-note {
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  color: var(--slate);
+  margin-top: 6px;
+}
+
+@media (max-width: 760px) {
+  .detail-layout { grid-template-columns: 1fr; }
+  .detail-cover { width: 200px; margin: 0 auto; }
+  .nav-search { display: none; }
+}
+
+/* ==========================================================================
+   PDF Reader — reading by lamplight, literally
+   ========================================================================== */
+
+body.reader-page { background: var(--midnight); }
+
+.reader-toolbar {
+  position: sticky;
+  top: 68px;
+  z-index: 40;
+  background: var(--midnight-raised);
+  border-bottom: 1px solid var(--night-line);
+}
+
+.reader-toolbar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  height: 56px;
+  flex-wrap: wrap;
+}
+
+.reader-back {
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+  color: var(--slate);
+  flex-shrink: 0;
+}
+.reader-back:hover { color: var(--amber-soft); }
+
+.reader-title {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.95rem;
+  color: var(--vellum);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  text-align: center;
+}
+
+.reader-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.reader-btn {
+  background: var(--midnight);
+  border: 1px solid var(--night-line);
+  color: var(--vellum);
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  transition: border-color 0.15s ease;
+}
+.reader-btn:hover { border-color: var(--amber); }
+
+#page-indicator {
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  color: var(--slate);
+  min-width: 70px;
+  text-align: center;
+}
+
+.reader-progress-track {
+  height: 3px;
+  background: var(--night-line);
+}
+.reader-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--amber);
+  transition: width 0.2s ease;
+}
+
+.reader-main {
+  padding: 40px 20px 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 60vh;
+}
+
+.reader-status {
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  color: var(--slate);
+  margin: 0 0 20px;
+  text-align: center;
+}
+.reader-status.is-error { color: var(--terracotta); }
+.reader-status:empty { display: none; }
+
+.canvas-wrap {
+  background: var(--vellum);
+  box-shadow: 0 0 80px rgba(212, 168, 67, 0.18), 0 20px 50px rgba(0, 0, 0, 0.5);
+  border-radius: 2px;
+  line-height: 0;
+}
+
+#pdf-canvas { display: block; max-width: 90vw; }
+
+@media (max-width: 700px) {
+  .reader-title { display: none; }
+  .reader-toolbar { top: 0; }
+}
+
+/* ==========================================================================
+   Auth pages — login & register
+   ========================================================================== */
+
+body.auth-page { background: var(--midnight); min-height: 100vh; }
+
+.auth-main {
+  position: relative;
+  min-height: calc(100vh - 68px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 20px;
+  overflow: hidden;
+}
+
+.auth-glow {
+  position: absolute;
+  top: -200px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 700px;
+  height: 600px;
+  background: radial-gradient(
+    circle at 50% 35%,
+    rgba(212, 168, 67, 0.35) 0%,
+    rgba(212, 168, 67, 0.1) 35%,
+    rgba(13, 17, 23, 0) 65%
+  );
+  pointer-events: none;
+  filter: blur(8px);
+}
+
+.auth-card {
+  position: relative;
+  z-index: 2;
+  background: var(--midnight-raised);
+  border: 1px solid var(--night-line);
+  border-radius: var(--radius-md);
+  padding: 44px 40px;
+  width: 100%;
+  max-width: 460px;
+}
+
+.auth-card--wide { max-width: 720px; }
+
+.auth-card-header { text-align: center; margin-bottom: 32px; }
+
+.auth-card-header h1 {
+  font-size: 2rem;
+  color: var(--vellum);
+}
+
+.auth-card-header p {
+  font-family: var(--font-ui);
+  font-size: 0.92rem;
+  color: var(--slate);
+  margin-top: 8px;
+}
+
+/* error & success messages */
+.auth-error {
+  background: rgba(196, 97, 74, 0.12);
+  border: 1px solid rgba(196, 97, 74, 0.4);
+  color: #E88A77;
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 20px;
+}
+
+.auth-success {
+  background: rgba(45, 74, 62, 0.25);
+  border: 1px solid rgba(45, 74, 62, 0.5);
+  color: #7FBB9E;
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 20px;
+}
+
+/* form layout */
+.auth-form { display: flex; flex-direction: column; gap: 20px; }
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-field { display: flex; flex-direction: column; gap: 6px; }
+
+.form-field label {
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--slate);
+  letter-spacing: 0.04em;
+}
+
+.required { color: var(--terracotta); }
+
+.form-field input[type="text"],
+.form-field input[type="email"],
+.form-field input[type="password"],
+.form-field input[type="url"] {
+  background: var(--midnight);
+  border: 1px solid var(--night-line);
+  border-radius: var(--radius-sm);
+  color: var(--vellum);
+  font-family: var(--font-ui);
+  font-size: 0.92rem;
+  padding: 11px 14px;
+  transition: border-color 0.15s ease;
+  width: 100%;
+}
+
+.form-field input:focus {
+  outline: none;
+  border-color: var(--amber);
+}
+
+.form-field input::placeholder { color: var(--slate); opacity: 0.6; }
+
+.field-hint {
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  color: var(--slate);
+  opacity: 0.7;
+}
+
+/* password show/hide */
+.input-with-toggle { position: relative; }
+.input-with-toggle input { padding-right: 42px; }
+
+.toggle-password {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--slate);
+  padding: 0;
+  line-height: 0;
+}
+.toggle-password:hover { color: var(--amber-soft); }
+
+/* password strength bar */
+.password-strength {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.strength-bar {
+  flex: 1;
+  height: 4px;
+  background: var(--night-line);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.strength-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 2px;
+  transition: width 0.3s ease, background 0.3s ease;
+}
+
+.strength-label {
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  font-weight: 500;
+  min-width: 60px;
+}
+
+/* avatar preview */
+.avatar-preview-row { display: flex; align-items: center; gap: 12px; }
+.avatar-preview {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--night-line);
+  flex-shrink: 0;
+}
+.avatar-preview-row input { flex: 1; }
+
+/* private account checkbox */
+.form-field--checkbox { margin-top: 4px; }
+
+.checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+  font-family: var(--font-ui);
+  font-size: 0.88rem;
+  color: var(--vellum);
+}
+
+.checkbox-label input[type="checkbox"] { display: none; }
+
+.checkbox-custom {
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--night-line);
+  border-radius: 3px;
+  background: var(--midnight);
+  flex-shrink: 0;
+  margin-top: 2px;
+  position: relative;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.checkbox-label input:checked + .checkbox-custom {
+  background: var(--amber);
+  border-color: var(--amber);
+}
+
+.checkbox-label input:checked + .checkbox-custom::after {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 2px;
+  width: 5px;
+  height: 9px;
+  border: 2px solid var(--midnight);
+  border-top: none;
+  border-left: none;
+  transform: rotate(45deg);
+}
+
+.checkbox-label small {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--slate);
+  margin-top: 2px;
+}
+
+/* submit button */
+.auth-submit {
+  width: 100%;
+  justify-content: center;
+  padding: 14px;
+  font-size: 0.95rem;
+  margin-top: 6px;
+}
+
+/* switch link (already have account / don't have account) */
+.auth-switch {
+  text-align: center;
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  color: var(--slate);
+  margin-top: 24px;
+  margin-bottom: 0;
+}
+
+.auth-switch a {
+  color: var(--amber-soft);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 600px) {
+  .auth-card { padding: 32px 22px; }
+  .form-row { grid-template-columns: 1fr; }
+  .auth-card--wide { max-width: 100%; }
+}

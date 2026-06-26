@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign in — Bibliotheca</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Crimson+Pro:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body class="auth-page">
+
+<header class="site-header">
+  <div class="container">
+    <a href="index.html" class="wordmark">Bibliotheca<span>.</span></a>
+    <nav class="site-nav">
+      <a href="index.html">Home</a>
+      <a href="catalogue.html">Catalogue</a>
+      <a href="inventory.html">Inventory</a>
+      <a href="transactions.html">Transactions</a>
+    </nav>
+  </div>
+</header>
+
+<main class="auth-main">
+  <div class="auth-glow" aria-hidden="true"></div>
+
+  <div class="auth-card">
+
+    <div class="auth-card-header">
+      <h1>Welcome back</h1>
+      <p>Sign in to resume reading where you left off.</p>
+    </div>
+
+    <div id="login-error" style="display:none;background:rgba(196,97,74,0.12);border:1px solid rgba(196,97,74,0.4);color:#E88A77;font-family:var(--font-ui);font-size:0.85rem;padding:12px 16px;border-radius:var(--radius-sm);margin-bottom:20px;"></div>
+
+    <div class="auth-form">
+
+      <div class="form-field">
+        <label for="username">Username</label>
+        <input
+          type="text"
+          id="username"
+          placeholder="Your username"
+          autocomplete="username"
+          required
+        >
+      </div>
+
+      <div class="form-field">
+        <label for="password">Password</label>
+        <div class="input-with-toggle">
+          <input
+            type="password"
+            id="password"
+            placeholder="Your password"
+            autocomplete="current-password"
+            required
+          >
+          <button type="button" class="toggle-password" id="toggle-pw" title="Show password" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--slate);padding:0;line-height:0;cursor:pointer;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <button class="btn btn-amber auth-submit" id="login-btn" style="width:100%;justify-content:center;padding:14px;font-size:0.95rem;margin-top:6px;">
+        Sign in
+      </button>
+
+    </div>
+
+    <p class="auth-switch" style="text-align:center;font-family:var(--font-ui);font-size:0.85rem;color:var(--slate);margin-top:24px;">
+      Don't have an account? <a href="register.html" style="color:var(--amber-soft);text-decoration:underline;text-underline-offset:3px;">Create one free</a>
+    </p>
+
+  </div>
+</main>
+
+<script>
+// ============================================================
+// ALL LOGIC INLINED - No external dependencies
+// ============================================================
+
+const API_BASE_URL = window.BIBLIOTHECA_API_BASE_URL || "http://localhost:8000";
+const AUTH_TOKEN_KEY = "bibliotheca:token";
+const AUTH_USER_KEY = "bibliotheca:user";
+
+// ── Auth helpers ──────────────────────────────────────────────
+
+function getToken() {
+  return localStorage.getItem(AUTH_TOKEN_KEY);
+}
+
+function getUser() {
+  try {
+    const raw = localStorage.getItem(AUTH_USER_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+function saveSession(token, user) {
+  localStorage.setItem(AUTH_TOKEN_KEY, token);
+  localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
+}
+
+function isLoggedIn() {
+  return !!getToken();
+}
+
+function requireGuest(redirectTo = "index.html") {
+  if (isLoggedIn()) {
+    window.location.href = redirectTo;
+    return false;
+  }
+  return true;
+}
+
+// ── Login function ────────────────────────────────────────────
+
+async function loginAndFetch(username, password) {
+  const form = new FormData();
+  form.append("username", username);
+  form.append("password", password);
+
+  const res = await fetch(`${API_BASE_URL}/login`, {
+    method: "POST",
+    body: form,
+  });
+
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.detail || "Login failed");
+  }
+
+  // Fetch user profile using the token
+  const meRes = await fetch(`${API_BASE_URL}/api/users/me`, {
+    headers: { Authorization: `Bearer ${data.access_token}` },
+  });
+  
+  if (!meRes.ok) {
+    throw new Error("Failed to fetch user profile");
+  }
+  
+  const user = await meRes.json();
+  return { token: data.access_token, user };
+}
+
+// ── Page logic ─────────────────────────────────────────────────
+
+// Redirect if already logged in
+requireGuest();
+
+// Get DOM elements - with null checks
+const usernameInput = document.getElementById("username");
+const passwordInput = document.getElementById("password");
+const loginBtn = document.getElementById("login-btn");
+const errorEl = document.getElementById("login-error");
+const togglePw = document.getElementById("toggle-pw");
+
+// Check if elements exist before adding event listeners
+if (togglePw) {
+  togglePw.addEventListener("click", () => {
+    if (passwordInput) {
+      const isText = passwordInput.type === "text";
+      passwordInput.type = isText ? "password" : "text";
+      togglePw.title = isText ? "Show password" : "Hide password";
+    }
+  });
+}
+
+function showError(msg) {
+  if (errorEl) {
+    errorEl.textContent = msg;
+    errorEl.style.display = "block";
+  }
+}
+
+function clearError() {
+  if (errorEl) {
+    errorEl.style.display = "none";
+  }
+}
+
+async function handleLogin() {
+  clearError();
+  
+  if (!usernameInput || !passwordInput) {
+    showError("Form elements not found.");
+    return;
+  }
+  
+  const username = usernameInput.value.trim();
+  const password = passwordInput.value;
+
+  if (!username || !password) {
+    showError("Please fill in both fields.");
+    return;
+  }
+
+  if (loginBtn) {
+    loginBtn.disabled = true;
+    loginBtn.textContent = "Signing in…";
+  }
+
+  try {
+    const { token, user } = await loginAndFetch(username, password);
+    
+    // Save session with full user info
+    saveSession(token, user);
+    
+    // Redirect based on role
+    if (user.role === "admin") {
+      window.location.href = "inventory.html";
+    } else {
+      window.location.href = "index.html";
+    }
+  } catch (err) {
+    showError(err.message || "Sign in failed. Check your username and password.");
+    if (loginBtn) {
+      loginBtn.disabled = false;
+      loginBtn.textContent = "Sign in";
+    }
+  }
+}
+
+// Add event listeners with null checks
+if (loginBtn) {
+  loginBtn.addEventListener("click", handleLogin);
+}
+
+if (usernameInput) {
+  usernameInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") handleLogin();
+  });
+}
+
+if (passwordInput) {
+  passwordInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") handleLogin();
+  });
+}
+
+console.log("Login page loaded successfully!");
+</script>
+
+</body>
+</html>

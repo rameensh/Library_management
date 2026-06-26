@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bibliotheca — a digital library for passionate readers</title>
+<meta name="description" content="Borrow the hardcopy, queue the audio, or open the PDF — one shelf, every format.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Crimson+Pro:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container">
+    <a href="index.html" class="wordmark">Bibliotheca<span>.</span></a>
+    <nav class="site-nav">
+      <a href="index.html" aria-current="page">Home</a>
+      <a href="catalogue.html">Catalogue</a>
+      <a href="inventory.html">Inventory</a>
+      <a href="transactions.html">Transactions</a>
+      <form class="nav-search" id="hero-search-form" role="search">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="search" placeholder="Search titles, authors…" aria-label="Search the catalogue">
+      </form>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="lamp-glow" aria-hidden="true"></div>
+  <div class="container hero-content">
+    <span class="eyebrow">A digital library for passionate readers</span>
+    <h1>Read by <em>lamplight</em>,<br>however you read.</h1>
+    <p class="lede">One shelf, every format. Borrow the hardcopy, queue the audiobook, or open the PDF tonight — your place is saved either way.</p>
+    <div class="hero-actions">
+      <a href="catalogue.html" class="btn btn-amber">Browse the catalogue</a>
+      <a href="#shelves" class="btn btn-ghost">See what's new</a>
+    </div>
+    <p class="hero-stat" id="hero-stat"></p>
+  </div>
+</section>
+
+<section class="shelves" id="shelves">
+  <div class="container">
+    <div class="shelves-intro">
+      <h2>Tonight's shelves</h2>
+      <p>A working catalogue, organized the way a library actually feels — by genre, not by algorithm.</p>
+    </div>
+    <div id="shelves-root">
+      <!-- Content will be loaded here by home.js -->
+      <div class="shelf">
+        <div class="shelf-row">
+          <div class="skeleton skeleton-card"></div>
+          <div class="skeleton skeleton-card"></div>
+          <div class="skeleton skeleton-card"></div>
+          <div class="skeleton skeleton-card"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <span class="wordmark">Bibliotheca<span>.</span></span>
+    <small>The reading room is always open.</small>
+  </div>
+</footer>
+
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/home.js"></script>
+<script>
+  // Wait for DOM to load, then update nav and render shelves
+  document.addEventListener("DOMContentLoaded", function() {
+    console.log("DOM loaded - updating nav");
+    updateNavForAuth();
+    
+    // Also make sure shelves are rendered
+    if (typeof renderShelves === 'function') {
+      console.log("Rendering shelves...");
+      renderShelves();
+    } else {
+      console.error("renderShelves function not found!");
+    }
+  });
+</script>
+</body>
+</html>

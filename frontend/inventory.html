@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inventory — Bibliotheca</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Crimson+Pro:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+.page-hero {
+  background: var(--midnight);
+  padding: 56px 0 48px;
+  border-bottom: 1px solid var(--night-line);
+}
+.page-hero h1 {
+  font-size: clamp(1.9rem, 4vw, 2.8rem);
+  color: var(--vellum);
+  margin-bottom: 8px;
+}
+.page-hero p {
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  color: var(--slate);
+  margin: 0;
+}
+
+.stats-bar {
+  background: var(--midnight);
+  padding: 20px 0;
+  display: none;
+}
+.stats-bar.visible { display: block; }
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+}
+.stat-chip {
+  background: var(--midnight-raised);
+  border: 1px solid var(--night-line);
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  text-align: center;
+}
+.stat-chip .stat-num {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  color: var(--amber-soft);
+  display: block;
+}
+.stat-chip .stat-lbl {
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  color: var(--slate);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-top: 4px;
+  display: block;
+}
+
+.inv-toolbar {
+  background: var(--vellum-raised);
+  border-bottom: 1px solid var(--paper-line);
+  padding: 14px 0;
+  position: sticky;
+  top: 68px;
+  z-index: 40;
+}
+.inv-toolbar .container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.inv-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--vellum);
+  border: 1px solid var(--paper-line);
+  border-radius: var(--radius-sm);
+  padding: 8px 14px;
+  flex: 1;
+  min-width: 200px;
+}
+.inv-search input {
+  background: transparent;
+  border: none;
+  font-family: var(--font-ui);
+  font-size: 0.88rem;
+  color: var(--ink);
+  width: 100%;
+}
+.inv-search input:focus { outline: none; }
+.inv-search svg { color: var(--slate); flex-shrink: 0; }
+
+.filter-select {
+  background: var(--vellum);
+  border: 1px solid var(--paper-line);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  color: var(--ink);
+  padding: 8px 12px;
+  cursor: pointer;
+}
+.filter-select:focus { outline: 2px solid var(--amber); }
+
+.inv-main { padding: 40px 0 80px; }
+
+.admin-panel {
+  background: var(--midnight-raised);
+  border: 1px solid var(--night-line);
+  border-radius: var(--radius-md);
+  padding: 28px 32px;
+  margin-bottom: 36px;
+  display: none;
+}
+.admin-panel.visible { display: block; }
+.admin-panel h2 {
+  font-size: 1.3rem;
+  color: var(--vellum);
+  margin-bottom: 18px;
+}
+.admin-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 12px;
+  align-items: end;
+}
+.admin-form-row .form-field label {
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  color: var(--slate);
+  letter-spacing: 0.04em;
+  display: block;
+  margin-bottom: 6px;
+}
+.admin-form-row input, .admin-form-row select {
+  background: var(--midnight);
+  border: 1px solid var(--night-line);
+  border-radius: var(--radius-sm);
+  color: var(--vellum);
+  font-family: var(--font-ui);
+  font-size: 0.88rem;
+  padding: 10px 14px;
+  width: 100%;
+}
+.admin-form-row input:focus, .admin-form-row select:focus { outline: none; border-color: var(--amber); }
+
+.inv-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--paper-line);
+  border-radius: var(--radius-md);
+  background: white;
+}
+.inv-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+}
+.inv-table thead { background: var(--midnight); }
+.inv-table thead th {
+  color: var(--slate);
+  font-weight: 500;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 14px 18px;
+  text-align: left;
+  white-space: nowrap;
+}
+.inv-table tbody tr {
+  border-bottom: 1px solid var(--paper-line);
+  transition: background 0.12s ease;
+}
+.inv-table tbody tr:last-child { border-bottom: none; }
+.inv-table tbody tr:hover { background: var(--vellum-raised); }
+.inv-table td {
+  padding: 14px 18px;
+  color: var(--ink);
+  vertical-align: middle;
+}
+.inv-table td.muted { color: var(--ink-soft); font-size: 0.8rem; }
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  padding: 3px 9px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.pill-green  { background: rgba(45,74,62,0.15);  color: #2D4A3E; }
+.pill-red    { background: rgba(196,97,74,0.15); color: #C4614A; }
+.pill-amber  { background: rgba(212,168,67,0.18); color: #9A7315; }
+.pill-slate  { background: rgba(139,155,180,0.15); color: var(--slate); }
+
+.btn-xs {
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 5px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.btn-xs:hover { opacity: 0.85; transform: translateY(-1px); }
+.btn-xs-amber  { background: var(--amber); color: var(--midnight); }
+.btn-xs-red    { background: var(--terracotta); color: white; }
+.btn-xs-ghost  { background: transparent; border-color: var(--paper-line); color: var(--ink-soft); }
+
+.inv-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--ink-soft);
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+}
+
+.skeleton-row td { padding: 14px 18px; }
+.skeleton-cell {
+  height: 16px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--vellum-raised) 25%, var(--vellum) 50%, var(--vellum-raised) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+@keyframes shimmer { to { background-position: -200% 0; } }
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(13,17,23,0.72);
+  z-index: 200;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-backdrop.open { display: flex; }
+.modal {
+  background: var(--midnight-raised);
+  border: 1px solid var(--night-line);
+  border-radius: var(--radius-md);
+  padding: 36px 40px;
+  width: 100%;
+  max-width: 480px;
+  position: relative;
+}
+.modal h3 { font-size: 1.4rem; color: var(--vellum); margin-bottom: 6px; }
+.modal .modal-sub {
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  color: var(--slate);
+  margin-bottom: 24px;
+}
+.modal-close {
+  position: absolute;
+  top: 16px; right: 18px;
+  background: none;
+  border: none;
+  color: var(--slate);
+  font-size: 1.3rem;
+  cursor: pointer;
+  line-height: 1;
+}
+.modal-close:hover { color: var(--vellum); }
+.modal .form-field { margin-bottom: 16px; }
+.modal .form-field label {
+  display: block;
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  color: var(--slate);
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+.modal .form-field input, .modal .form-field select {
+  width: 100%;
+  background: var(--midnight);
+  border: 1px solid var(--night-line);
+  border-radius: var(--radius-sm);
+  color: var(--vellum);
+  font-family: var(--font-ui);
+  font-size: 0.88rem;
+  padding: 10px 14px;
+}
+.modal .form-field input:focus, .modal .form-field select:focus { outline: none; border-color: var(--amber); }
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
+.modal-error {
+  background: rgba(196,97,74,0.12);
+  border: 1px solid rgba(196,97,74,0.4);
+  color: #E88A77;
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 16px;
+  display: none;
+}
+
+.toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--midnight-raised);
+  border: 1px solid var(--night-line);
+  color: var(--vellum);
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  padding: 12px 22px;
+  border-radius: var(--radius-sm);
+  z-index: 999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast.toast-error { border-color: rgba(196,97,74,0.5); color: #E88A77; }
+
+@media (max-width: 700px) {
+  .admin-form-row { grid-template-columns: 1fr; }
+  .inv-toolbar .container { flex-direction: column; align-items: stretch; }
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container">
+    <a href="index.html" class="wordmark">Bibliotheca<span>.</span></a>
+    <nav class="site-nav" id="site-nav">
+      <a href="index.html">Home</a>
+      <a href="catalogue.html">Catalogue</a>
+      <a href="inventory.html" aria-current="page">Inventory</a>
+      <a href="transactions.html">Transactions</a>
+    </nav>
+  </div>
+</header>
+
+<div class="stats-bar" id="stats-bar">
+  <div class="container">
+    <div class="stats-grid" id="stats-grid">
+      <div class="stat-chip"><span class="stat-num" id="stat-total">—</span><span class="stat-lbl">Total copies</span></div>
+      <div class="stat-chip"><span class="stat-num" id="stat-avail">—</span><span class="stat-lbl">Available</span></div>
+      <div class="stat-chip"><span class="stat-num" id="stat-borrowed">—</span><span class="stat-lbl">Borrowed</span></div>
+      <div class="stat-chip"><span class="stat-num" id="stat-overdue">—</span><span class="stat-lbl">Overdue</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="page-hero">
+  <div class="container">
+    <span class="eyebrow">Physical collection</span>
+    <h1 id="page-title">Book Inventory</h1>
+    <p id="page-sub">Browse hardcopy availability across the library collection.</p>
+  </div>
+</div>
+
+<div class="inv-toolbar">
+  <div class="container">
+    <div class="inv-search">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="search-input" placeholder="Search by book title or author…">
+    </div>
+    <select class="filter-select" id="condition-filter">
+      <option value="">All conditions</option>
+      <option value="good">Good</option>
+      <option value="damaged">Damaged</option>
+      <option value="lost">Lost</option>
+    </select>
+    <select class="filter-select" id="avail-filter">
+      <option value="">All status</option>
+      <option value="available">Available</option>
+      <option value="borrowed">Borrowed</option>
+    </select>
+  </div>
+</div>
+
+<main class="inv-main">
+  <div class="container">
+
+    <div class="admin-panel" id="admin-panel">
+      <h2>Add inventory copy</h2>
+      <div class="admin-form-row">
+        <div class="form-field">
+          <label>Book ID (UUID)</label>
+          <input type="text" id="add-book-id" placeholder="Paste book UUID…">
+        </div>
+        <div class="form-field">
+          <label>Condition</label>
+          <select id="add-condition">
+            <option value="good">Good</option>
+            <option value="damaged">Damaged</option>
+          </select>
+        </div>
+        <button class="btn btn-amber" id="add-copy-btn">+ Add copy</button>
+      </div>
+      <p id="add-error" style="display:none;font-family:var(--font-ui);font-size:0.82rem;color:#E88A77;margin-top:10px;"></p>
+    </div>
+
+    <div class="inv-table-wrap">
+      <table class="inv-table">
+        <thead>
+          <tr>
+            <th>Book Title</th>
+            <th>Copy #</th>
+            <th>Condition</th>
+            <th>Status</th>
+            <th>Added</th>
+            <th id="actions-col" style="display:none;">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="inv-body">
+          <tr class="skeleton-row"><td><div class="skeleton-cell" style="width:220px"></div></td><td><div class="skeleton-cell" style="width:30px"></div></td><td><div class="skeleton-cell" style="width:60px"></div></td><td><div class="skeleton-cell" style="width:80px"></div></td><td><div class="skeleton-cell" style="width:90px"></div></td></tr>
+          <tr class="skeleton-row"><td><div class="skeleton-cell" style="width:220px"></div></td><td><div class="skeleton-cell" style="width:30px"></div></td><td><div class="skeleton-cell" style="width:60px"></div></td><td><div class="skeleton-cell" style="width:80px"></div></td><td><div class="skeleton-cell" style="width:90px"></div></td></tr>
+          <tr class="skeleton-row"><td><div class="skeleton-cell" style="width:220px"></div></td><td><div class="skeleton-cell" style="width:30px"></div></td><td><div class="skeleton-cell" style="width:60px"></div></td><td><div class="skeleton-cell" style="width:80px"></div></td><td><div class="skeleton-cell" style="width:90px"></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</main>
+
+<div class="modal-backdrop" id="edit-modal">
+  <div class="modal">
+    <button class="modal-close" id="edit-modal-close">×</button>
+    <h3>Edit copy</h3>
+    <p class="modal-sub" id="edit-modal-sub">Copy #—</p>
+    <p class="modal-error" id="edit-error"></p>
+    <div class="form-field">
+      <label>Condition</label>
+      <select id="edit-condition">
+        <option value="good">Good</option>
+        <option value="damaged">Damaged</option>
+        <option value="lost">Lost</option>
+      </select>
+    </div>
+    <div class="form-field">
+      <label>Availability</label>
+      <select id="edit-available">
+        <option value="true">Available</option>
+        <option value="false">Borrowed / unavailable</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" id="edit-cancel">Cancel</button>
+      <button class="btn btn-amber" id="edit-save">Save changes</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="delete-modal">
+  <div class="modal">
+    <button class="modal-close" id="delete-modal-close">×</button>
+    <h3>Remove copy</h3>
+    <p class="modal-sub">This will permanently remove the copy from inventory. This cannot be undone.</p>
+    <p class="modal-error" id="delete-error"></p>
+    <div class="modal-actions">
+      <button class="btn btn-outline" id="delete-cancel">Cancel</button>
+      <button class="btn" style="background:var(--terracotta);color:white;" id="delete-confirm">Yes, remove</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<footer class="site-footer">
+  <div class="container">
+    <span class="wordmark">Bibliotheca<span>.</span></span>
+    <small>The reading room is always open.</small>
+  </div>
+</footer>
+
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script>
+// ============================================================
+// INVENTORY PAGE LOGIC - FIXED VERSION
+// ============================================================
+
+const API = window.BIBLIOTHECA_API_BASE_URL || "http://localhost:8000";
+
+// ── Helper functions ──────────────────────────────────────────
+
+function getToken() {
+  return localStorage.getItem("bibliotheca:token");
+}
+
+function getUser() {
+  try {
+    const raw = localStorage.getItem("bibliotheca:user");
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+function headers() {
+  const token = getToken();
+  return {
+    "Content-Type": "application/json",
+    "Authorization": `Bearer ${token}`
+  };
+}
+
+function showToast(msg, isError = false) {
+  const t = document.getElementById("toast");
+  if (!t) return;
+  t.textContent = msg;
+  t.className = "toast" + (isError ? " toast-error" : "");
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 3000);
+}
+
+function formatDate(iso) {
+  if (!iso) return "—";
+  return new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+}
+
+function conditionPill(c) {
+  const map = { good: "pill-green", damaged: "pill-amber", lost: "pill-red" };
+  return `<span class="pill ${map[c] || "pill-slate"}">${c || "unknown"}</span>`;
+}
+
+function statusPill(available) {
+  return available
+    ? `<span class="pill pill-green">Available</span>`
+    : `<span class="pill pill-red">Borrowed</span>`;
+}
+
+function escapeHTML(s) {
+  const d = document.createElement("div");
+  d.textContent = s ?? "";
+  return d.innerHTML;
+}
+
+// ── State ──────────────────────────────────────────────────────
+
+let currentUser = null;
+let isAdmin = false;
+let allItems = [];
+let searchTimer = null;
+
+// ── Init ──────────────────────────────────────────────────────
+
+function init() {
+  // Update nav with auth buttons
+  updateNavForAuth();
+  
+  // Check if user is logged in
+  currentUser = getUser();
+  
+  if (!currentUser) {
+    // Not logged in - show message
+    document.getElementById("inv-body").innerHTML = `
+      <tr><td colspan="6">
+        <div class="inv-empty" style="padding:60px 20px;text-align:center;">
+          <p style="font-family:var(--font-ui);font-size:1rem;color:var(--ink-soft);">
+            🔐 Please <a href="login.html" style="color:var(--amber);">sign in</a> to view inventory.
+          </p>
+        </div>
+      </td></tr>
+    `;
+    return;
+  }
+  
+  // Check if user is admin
+  isAdmin = currentUser.role === "admin";
+  
+  if (isAdmin) {
+    document.getElementById("page-title").textContent = "Inventory Management";
+    document.getElementById("page-sub").textContent = "Manage physical book copies, conditions, and availability.";
+    document.getElementById("admin-panel").classList.add("visible");
+    document.getElementById("stats-bar").classList.add("visible");
+    document.getElementById("actions-col").style.display = "";
+    loadAdminStats();
+  }
+  
+  // Load inventory
+  loadInventory();
+}
+
+// ── Admin stats ──────────────────────────────────────────────
+
+async function loadAdminStats() {
+  try {
+    const res = await fetch(`${API}/api/book_inventory`, { headers: headers() });
+    if (!res.ok) return;
+    const data = await res.json();
+    const items = data.items || [];
+    const total = items.length;
+    const avail = items.filter(i => i.is_available).length;
+    const borrowed = total - avail;
+    
+    document.getElementById("stat-total").textContent = total;
+    document.getElementById("stat-avail").textContent = avail;
+    document.getElementById("stat-borrowed").textContent = borrowed;
+
+    const ov = await fetch(`${API}/api/transactions/overdue`, { headers: headers() });
+    if (ov.ok) {
+      const ovData = await ov.json();
+      document.getElementById("stat-overdue").textContent = ovData.length;
+    }
+  } catch (e) {
+    console.error("Failed to load admin stats:", e);
+  }
+}
+
+// ── Load inventory ───────────────────────────────────────────
+
+function skeletonRows(n) {
+  const cols = isAdmin ? 6 : 5;
+  return Array.from({ length: n }, () => `
+    <tr class="skeleton-row">
+      ${Array.from({ length: cols }, () => 
+        `<td><div class="skeleton-cell" style="width:${80 + Math.random() * 80 | 0}px"></div></td>`
+      ).join("")}
+    </tr>
+  `).join("");
+}
+
+async function loadInventory(search = "") {
+  const body = document.getElementById("inv-body");
+  body.innerHTML = skeletonRows(5);
+
+  try {
+    const params = new URLSearchParams();
+    if (search) params.set("search", search);
+    
+    const res = await fetch(`${API}/api/book_inventory?${params}`, { 
+      headers: headers() 
+    });
+    
+    if (res.status === 401) {
+      body.innerHTML = `<tr><td colspan="6"><div class="inv-empty">
+        <p>Session expired. Please <a href="login.html" style="color:var(--amber);">sign in again</a>.</p>
+      </div></td></tr>`;
+      return;
+    }
+    
+    if (!res.ok) throw new Error("Failed to load inventory");
+    
+    const data = await res.json();
+    allItems = data.items || [];
+    renderTable(allItems);
+  } catch (err) {
+    console.error("Error loading inventory:", err);
+    body.innerHTML = `<tr><td colspan="6"><div class="inv-empty">
+      <p>${escapeHTML(err.message)}</p>
+    </div></td></tr>`;
+  }
+}
+
+function renderTable(items) {
+  const condFilter = document.getElementById("condition-filter").value;
+  const availFilter = document.getElementById("avail-filter").value;
+
+  let filtered = items;
+  if (condFilter) filtered = filtered.filter(i => i.condition === condFilter);
+  if (availFilter === "available") filtered = filtered.filter(i => i.is_available);
+  if (availFilter === "borrowed") filtered = filtered.filter(i => !i.is_available);
+
+  const body = document.getElementById("inv-body");
+  if (!filtered.length) {
+    body.innerHTML = `<tr><td colspan="${isAdmin ? 6 : 5}"><div class="inv-empty">
+      <p>No inventory copies found.</p>
+    </div></td></tr>`;
+    return;
+  }
+
+  body.innerHTML = filtered.map(item => `
+    <tr>
+      <td class="muted" style="font-family:var(--font-ui);font-size:0.78rem;">
+        <strong>${escapeHTML(item.book?.title || "Unknown Book")}</strong><br>
+        <small>${escapeHTML(item.book?.author || "")}</small>
+      </td>
+      <td style="font-weight:500;">Copy #${item.copy_number}</td>
+      <td>${conditionPill(item.condition)}</td>
+      <td>${statusPill(item.is_available)}</td>
+      <td class="muted">${formatDate(item.created_at)}</td>
+      ${isAdmin ? `<td>
+        <div class="row-actions">
+          <button class="btn-xs btn-xs-amber" onclick="openEditModal('${item.id}','${item.condition}',${item.is_available},${item.copy_number})">Edit</button>
+          <button class="btn-xs btn-xs-red" onclick="openDeleteModal('${item.id}',${item.is_available})">Remove</button>
+        </div>
+      </td>` : ""}
+    </tr>
+  `).join("");
+}
+
+// ── Search and filters ───────────────────────────────────────
+
+document.getElementById("search-input").addEventListener("input", (e) => {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => loadInventory(e.target.value.trim()), 380);
+});
+
+document.getElementById("condition-filter").addEventListener("change", () => renderTable(allItems));
+document.getElementById("avail-filter").addEventListener("change", () => renderTable(allItems));
+
+// ── Add copy (admin) ─────────────────────────────────────────
+
+document.getElementById("add-copy-btn").addEventListener("click", async () => {
+  const bookId = document.getElementById("add-book-id").value.trim();
+  const errEl = document.getElementById("add-error");
+  errEl.style.display = "none";
+  
+  if (!bookId) {
+    errEl.textContent = "Book ID is required.";
+    errEl.style.display = "block";
+    return;
+  }
+
+  const btn = document.getElementById("add-copy-btn");
+  btn.disabled = true;
+  btn.textContent = "Adding…";
+  
+  try {
+    const res = await fetch(`${API}/api/book_inventory`, {
+      method: "POST",
+      headers: headers(),
+      body: JSON.stringify({ book_id: bookId })
+    });
+    
+    if (!res.ok) {
+      const d = await res.json();
+      throw new Error(d.detail || "Failed");
+    }
+    
+    showToast("Copy added successfully.");
+    document.getElementById("add-book-id").value = "";
+    loadInventory(document.getElementById("search-input").value.trim());
+    loadAdminStats();
+  } catch (err) {
+    errEl.textContent = err.message;
+    errEl.style.display = "block";
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "+ Add copy";
+  }
+});
+
+// ── Edit modal ────────────────────────────────────────────────
+
+let editingId = null;
+
+function openEditModal(id, condition, isAvailable, copyNum) {
+  editingId = id;
+  document.getElementById("edit-modal-sub").textContent = `Copy #${copyNum}`;
+  document.getElementById("edit-condition").value = condition;
+  document.getElementById("edit-available").value = String(isAvailable);
+  document.getElementById("edit-error").style.display = "none";
+  document.getElementById("edit-modal").classList.add("open");
+}
+
+function closeEditModal() {
+  document.getElementById("edit-modal").classList.remove("open");
+  editingId = null;
+}
+
+document.getElementById("edit-modal-close").addEventListener("click", closeEditModal);
+document.getElementById("edit-cancel").addEventListener("click", closeEditModal);
+document.getElementById("edit-modal").addEventListener("click", function(e) {
+  if (e.target === this) closeEditModal();
+});
+
+document.getElementById("edit-save").addEventListener("click", async () => {
+  if (!editingId) return;
+  
+  const payload = {
+    condition: document.getElementById("edit-condition").value,
+    is_available: document.getElementById("edit-available").value === "true"
+  };
+  
+  const errEl = document.getElementById("edit-error");
+  errEl.style.display = "none";
+  
+  try {
+    const res = await fetch(`${API}/api/book_inventory/${editingId}`, {
+      method: "PUT",
+      headers: headers(),
+      body: JSON.stringify(payload)
+    });
+    
+    if (!res.ok) {
+      const d = await res.json();
+      throw new Error(d.detail || "Update failed");
+    }
+    
+    showToast("Copy updated.");
+    closeEditModal();
+    loadInventory(document.getElementById("search-input").value.trim());
+    loadAdminStats();
+  } catch (err) {
+    errEl.textContent = err.message;
+    errEl.style.display = "block";
+  }
+});
+
+// ── Delete modal ──────────────────────────────────────────────
+
+let deletingId = null;
+
+function openDeleteModal(id, isAvailable) {
+  if (!isAvailable) {
+    showToast("Cannot remove a currently borrowed copy.", true);
+    return;
+  }
+  deletingId = id;
+  document.getElementById("delete-error").style.display = "none";
+  document.getElementById("delete-modal").classList.add("open");
+}
+
+function closeDeleteModal() {
+  document.getElementById("delete-modal").classList.remove("open");
+  deletingId = null;
+}
+
+document.getElementById("delete-modal-close").addEventListener("click", closeDeleteModal);
+document.getElementById("delete-cancel").addEventListener("click", closeDeleteModal);
+document.getElementById("delete-modal").addEventListener("click", function(e) {
+  if (e.target === this) closeDeleteModal();
+});
+
+document.getElementById("delete-confirm").addEventListener("click", async () => {
+  if (!deletingId) return;
+  
+  const errEl = document.getElementById("delete-error");
+  errEl.style.display = "none";
+  
+  try {
+    const res = await fetch(`${API}/api/book_inventory/${deletingId}`, {
+      method: "DELETE",
+      headers: headers()
+    });
+    
+    if (!res.ok) {
+      const d = await res.json();
+      throw new Error(d.detail || "Delete failed");
+    }
+    
+    showToast("Copy removed from inventory.");
+    closeDeleteModal();
+    loadInventory(document.getElementById("search-input").value.trim());
+    loadAdminStats();
+  } catch (err) {
+    errEl.textContent = err.message;
+    errEl.style.display = "block";
+  }
+});
+
+// ── Initialize ───────────────────────────────────────────────
+
+document.addEventListener("DOMContentLoaded", init);
+</script>
+
+</body>
+</html>

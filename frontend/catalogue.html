@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catalogue — Bibliotheca</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Crimson+Pro:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container">
+    <a href="index.html" class="wordmark">Bibliotheca<span>.</span></a>
+    <nav class="site-nav">
+      <a href="index.html">Home</a>
+      <a href="catalogue.html" aria-current="page">Catalogue</a>
+    </nav>
+  </div>
+</header>
+
+<section class="catalogue-header">
+  <div class="container">
+    <h1>The full catalogue</h1>
+    <p>Search by title or author, narrow by genre or format, then settle in.</p>
+
+    <div class="filters">
+      <input type="search" id="search-input" placeholder="Search titles, authors…" aria-label="Search">
+      <button class="pill format-pill" data-format="pdf">PDF</button>
+      <button class="pill format-pill" data-format="audio">Audio</button>
+      <button class="pill format-pill" data-format="hardcopy">Hardcopy</button>
+      <select id="sort-select" class="pill" aria-label="Sort by" style="cursor:pointer;">
+        <option value="title">Sort: Title A–Z</option>
+        <option value="author">Sort: Author A–Z</option>
+        <option value="created_at">Sort: Newest first</option>
+      </select>
+    </div>
+    <div class="filters" id="genre-pills" style="margin-top:6px;"></div>
+  </div>
+</section>
+
+<section class="catalogue-body">
+  <div class="container">
+    <p class="catalogue-meta" id="results-meta"></p>
+    <div class="catalogue-grid" id="results-grid"></div>
+    <div class="pagination" id="pagination"></div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <span class="wordmark">Bibliotheca<span>.</span></span>
+    <small>The reading room is always open.</small>
+  </div>
+</footer>
+
+<script src="js/api.js"></script>
+<script src="js/catalogue.js"></script>
+</body>
+</html>

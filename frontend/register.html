@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create account — Bibliotheca</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Crimson+Pro:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body class="auth-page">
+
+<header class="site-header">
+  <div class="container">
+    <a href="index.html" class="wordmark">Bibliotheca<span>.</span></a>
+    <nav class="site-nav">
+      <a href="index.html">Home</a>
+      <a href="catalogue.html">Catalogue</a>
+    </nav>
+  </div>
+</header>
+
+<main class="auth-main">
+  <div class="auth-glow" aria-hidden="true"></div>
+
+  <div class="auth-card auth-card--wide">
+
+    <div class="auth-card-header">
+      <h1>Open your account</h1>
+      <p>One shelf, every format. Free to join.</p>
+    </div>
+
+    <p class="auth-error" id="register-error" style="display:none;"></p>
+    <p class="auth-success" id="register-success" style="display:none;"></p>
+
+    <div class="auth-form" id="register-form">
+
+      <div class="form-row">
+        <div class="form-field">
+          <label for="username">Username <span class="required">*</span></label>
+          <input
+            type="text"
+            id="username"
+            placeholder="e.g. rimsha_reads"
+            autocomplete="username"
+            maxlength="50"
+            required
+          >
+          <span class="field-hint">Letters, numbers, underscores. Max 50 characters.</span>
+        </div>
+
+        <div class="form-field">
+          <label for="email">Email <span class="required">*</span></label>
+          <input
+            type="email"
+            id="email"
+            placeholder="you@example.com"
+            autocomplete="email"
+            maxlength="100"
+            required
+          >
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label for="password">Password <span class="required">*</span></label>
+          <div class="input-with-toggle">
+            <input
+              type="password"
+              id="password"
+              placeholder="At least 8 characters"
+              autocomplete="new-password"
+              minlength="8"
+              maxlength="128"
+              required
+            >
+            <button type="button" class="toggle-password" id="toggle-pw" title="Show password">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+          <div class="password-strength" id="pw-strength" style="display:none;">
+            <div class="strength-bar"><div class="strength-fill" id="strength-fill"></div></div>
+            <span class="strength-label" id="strength-label"></span>
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label for="address">Delivery address</label>
+          <input
+            type="text"
+            id="address"
+            placeholder="For hardcopy book deliveries"
+            maxlength="200"
+          >
+          <span class="field-hint">Optional — needed if you want to borrow physical books.</span>
+        </div>
+      </div>
+
+      <div class="form-field form-field--avatar">
+        <label for="avatar_url">Profile picture URL</label>
+        <div class="avatar-preview-row">
+          <img id="avatar-preview" src="" alt="" style="display:none;" class="avatar-preview">
+          <input
+            type="url"
+            id="avatar_url"
+            placeholder="https://example.com/your-photo.jpg"
+          >
+        </div>
+        <span class="field-hint">Paste any image URL, or leave blank for a default avatar.</span>
+      </div>
+
+      <div class="form-field form-field--checkbox">
+        <label class="checkbox-label">
+          <input type="checkbox" id="is_private">
+          <span class="checkbox-custom"></span>
+          <span>
+            Private account
+            <small>Other readers won't see your goals or reading activity.</small>
+          </span>
+        </label>
+      </div>
+
+      <button class="btn btn-amber auth-submit" id="register-btn">
+        Create my account
+      </button>
+
+    </div>
+
+    <p class="auth-switch">
+      Already have an account? <a href="login.html">Sign in</a>
+    </p>
+
+  </div>
+</main>
+
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script>
+  // redirect away if already logged in
+  AuthAPI.requireGuest();
+
+  const fields = {
+    username: document.getElementById("username"),
+    email: document.getElementById("email"),
+    password: document.getElementById("password"),
+    address: document.getElementById("address"),
+    avatar_url: document.getElementById("avatar_url"),
+    is_private: document.getElementById("is_private"),
+  };
+
+  const registerBtn = document.getElementById("register-btn");
+  const errorEl = document.getElementById("register-error");
+  const successEl = document.getElementById("register-success");
+  const togglePw = document.getElementById("toggle-pw");
+  const avatarPreview = document.getElementById("avatar-preview");
+  const pwStrength = document.getElementById("pw-strength");
+  const strengthFill = document.getElementById("strength-fill");
+  const strengthLabel = document.getElementById("strength-label");
+
+  // password show/hide
+  togglePw.addEventListener("click", () => {
+    const isText = fields.password.type === "text";
+    fields.password.type = isText ? "password" : "text";
+    togglePw.title = isText ? "Show password" : "Hide password";
+  });
+
+  // password strength indicator
+  fields.password.addEventListener("input", () => {
+    const pw = fields.password.value;
+    if (!pw) { pwStrength.style.display = "none"; return; }
+    pwStrength.style.display = "flex";
+
+    let score = 0;
+    if (pw.length >= 8) score++;
+    if (pw.length >= 12) score++;
+    if (/[A-Z]/.test(pw)) score++;
+    if (/[0-9]/.test(pw)) score++;
+    if (/[^A-Za-z0-9]/.test(pw)) score++;
+
+    const levels = [
+      { label: "Too short", color: "#C4614A", width: "15%" },
+      { label: "Weak", color: "#C4614A", width: "30%" },
+      { label: "Fair", color: "#D4A843", width: "55%" },
+      { label: "Good", color: "#2D4A3E", width: "75%" },
+      { label: "Strong", color: "#2D4A3E", width: "100%" },
+    ];
+    const level = levels[Math.min(score, 4)];
+    strengthFill.style.width = level.width;
+    strengthFill.style.background = level.color;
+    strengthLabel.textContent = level.label;
+    strengthLabel.style.color = level.color;
+  });
+
+  // avatar preview
+  let avatarDebounce;
+  fields.avatar_url.addEventListener("input", () => {
+    clearTimeout(avatarDebounce);
+    avatarDebounce = setTimeout(() => {
+      const url = fields.avatar_url.value.trim();
+      if (url) {
+        avatarPreview.src = url;
+        avatarPreview.style.display = "block";
+        avatarPreview.onerror = () => { avatarPreview.style.display = "none"; };
+      } else {
+        avatarPreview.style.display = "none";
+      }
+    }, 400);
+  });
+
+  function showError(msg) {
+    errorEl.textContent = msg;
+    errorEl.style.display = "block";
+    successEl.style.display = "none";
+  }
+  function showSuccess(msg) {
+    successEl.textContent = msg;
+    successEl.style.display = "block";
+    errorEl.style.display = "none";
+  }
+  function clearMessages() {
+    errorEl.style.display = "none";
+    successEl.style.display = "none";
+  }
+
+  function validate() {
+    const { username, email, password } = fields;
+    if (!username.value.trim()) { showError("Username is required."); return false; }
+    if (username.value.trim().length < 1) { showError("Username too short."); return false; }
+    if (!email.value.trim()) { showError("Email is required."); return false; }
+    if (!email.value.includes("@")) { showError("Please enter a valid email."); return false; }
+    if (!password.value) { showError("Password is required."); return false; }
+    if (password.value.length < 8) { showError("Password must be at least 8 characters."); return false; }
+    return true;
+  }
+
+  async function handleRegister() {
+    clearMessages();
+    if (!validate()) return;
+
+    registerBtn.disabled = true;
+    registerBtn.textContent = "Creating account…";
+
+    try {
+      const data = await AuthAPI.register({
+        username: fields.username.value.trim(),
+        email: fields.email.value.trim(),
+        password: fields.password.value,
+        address: fields.address.value.trim() || null,
+        avatar_url: fields.avatar_url.value.trim() || null,
+        is_private: fields.is_private.checked,
+      });
+
+      // save token and basic user info
+      AuthAPI.saveSession(data.access_token, {
+        username: fields.username.value.trim(),
+        email: fields.email.value.trim(),
+        avatar_url: fields.avatar_url.value.trim() || null,
+      });
+
+      showSuccess("Account created! Redirecting…");
+      setTimeout(() => { window.location.href = "index.html"; }, 1000);
+
+    } catch (err) {
+      showError(err.message || "Registration failed. Please try again.");
+      registerBtn.disabled = false;
+      registerBtn.textContent = "Create my account";
+    }
+  }
+
+  registerBtn.addEventListener("click", handleRegister);
+
+  // Enter key on any field submits
+  Object.values(fields).forEach((el) => {
+    if (el.type !== "checkbox") {
+      el.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") handleRegister();
+      });
+    }
+  });
+</script>
+
+</body>
+</html>
