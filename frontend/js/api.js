@@ -1,6 +1,11 @@
 // api.js — thin wrapper around the Bibliotheca Books API.
 // Change this to match your backend URL
-const API_BASE_URL = "http://localhost:8000";  // ← Make sure this is 8000
+// const API_BASE_URL = "http://localhost:8000";  // ← Make sure this is 8000
+const API_BASE_URL =
+  window.location.hostname === "localhost" ||
+  window.location.hostname === "127.0.0.1"
+    ? "http://127.0.0.1:8000"
+    : "https://library-management-km70.onrender.com";
 
 async function apiGet(path) {
   const res = await fetch(`${API_BASE_URL}${path}`);

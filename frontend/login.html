@@ -85,7 +85,13 @@
 // ALL LOGIC INLINED - No external dependencies
 // ============================================================
 
-const API_BASE_URL = window.BIBLIOTHECA_API_BASE_URL || "http://localhost:8000";
+// const API_BASE_URL = window.BIBLIOTHECA_API_BASE_URL || "http://localhost:8000";
+const API =
+  window.BIBLIOTHECA_API_BASE_URL ||
+  (window.location.hostname === "localhost" ||
+   window.location.hostname === "127.0.0.1"
+    ? "http://127.0.0.1:8000"
+    : "https://library-management-km70.onrender.com");
 const AUTH_TOKEN_KEY = "bibliotheca:token";
 const AUTH_USER_KEY = "bibliotheca:user";
 
