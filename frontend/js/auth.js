@@ -128,93 +128,85 @@ const AuthAPI = {
 
 // ── Update navigation based on auth state ────────────────────
 
-function updateNavForAuth() {
-  const nav = document.querySelector(".site-nav");
-  if (!nav) return;
-
-  const user = AuthAPI.getUser();
-
-  // Remove old auth links to avoid duplicates
-  nav.querySelectorAll(".auth-nav-item").forEach((el) => el.remove());
-
-  if (user) {
-    const roleBadge = user.role === "admin" ? " ⚡" : "";
-    nav.insertAdjacentHTML(
-      "beforeend",
-      `
-      <span class="auth-nav-item" style="color:var(--amber-soft);font-family:var(--font-ui);font-size:0.88rem;padding:0 8px;">
-        👤 ${escapeHTML(user.username)}${roleBadge}
-      </span>
-      <button onclick="AuthAPI.logout()" class="auth-nav-item btn btn-ghost" style="padding:6px 14px;font-size:0.82rem;background:transparent;border:1px solid var(--night-line);color:var(--vellum);border-radius:4px;cursor:pointer;">
-        Sign out
-      </button>
-    `
-    );
-  } else {
-    nav.insertAdjacentHTML(
-      "beforeend",
-      `
-      <a href="login.html" class="auth-nav-item" style="color:var(--slate);font-family:var(--font-ui);font-size:0.88rem;">Sign in</a>
-      <a href="register.html" class="auth-nav-item btn btn-amber" style="padding:8px 16px;font-size:0.82rem;background:var(--amber);color:var(--midnight);border-radius:4px;text-decoration:none;">Join free</a>
-    `
-    );
-  }
-}
-
 function escapeHTML(str) {
   const div = document.createElement("div");
   div.textContent = str ?? "";
   return div.innerHTML;
 }
 
-// auth.js - Add this if not already there
-
 function isUserAdmin() {
-  try {
-    const user = JSON.parse(localStorage.getItem('bibliotheca:user') || '{}');
-    return user.role === 'admin' || user.isAdmin === true;
-  } catch {
-    return false;
-  }
+  const user = AuthAPI.getUser();
+  return user && user.role === "admin";
 }
 
 function updateNavForAuth() {
-  const inventoryLink = document.getElementById('inventoryNavLink');
-  if (!inventoryLink) return;
-  
-  const isAdmin = isUserAdmin();
-  console.log('🛡️ Is user admin?', isAdmin);
-  
-  if (isAdmin) {
-    inventoryLink.style.display = '';
-    inventoryLink.style.visibility = 'visible';
-    document.body.classList.add('admin-logged-in');
+  const nav = document.querySelector(".site-nav");
+  if (!nav) return;
+
+  // Remove previous auth items
+  nav.querySelectorAll(".auth-nav-item").forEach(el => el.remove());
+
+  const user = AuthAPI.getUser();
+
+  // Inventory link
+  const inventory = document.getElementById("inventoryNavLink");
+  if (inventory) {
+    inventory.style.display = isUserAdmin() ? "" : "none";
+  }
+
+  if (user) {
+    nav.insertAdjacentHTML(
+      "beforeend",
+      `
+      <span class="auth-nav-item">
+        👤 ${escapeHTML(user.username)}
+      </span>
+
+      <button
+        class="auth-nav-item btn btn-ghost"
+        onclick="AuthAPI.logout()">
+        Sign out
+      </button>
+      `
+    );
+
+    if (isUserAdmin()) {
+      document.body.classList.add("admin-logged-in");
+    } else {
+      document.body.classList.remove("admin-logged-in");
+    }
+
   } else {
-    inventoryLink.style.display = 'none';
-    inventoryLink.style.visibility = 'hidden';
-    document.body.classList.remove('admin-logged-in');
+
+    nav.insertAdjacentHTML(
+      "beforeend",
+      `
+      <a href="login.html" class="auth-nav-item">
+        Sign in
+      </a>
+
+      <a href="register.html"
+         class="auth-nav-item btn btn-amber">
+         Join free
+      </a>
+      `
+    );
+
+    document.body.classList.remove("admin-logged-in");
   }
 }
 
-// Run on page load
-document.addEventListener('DOMContentLoaded', function() {
-  updateNavForAuth();
-  
-  // Also handle theme if needed
-  const container = document.getElementById('theme-controls');
-  if (container && typeof getThemeToggleHTML === 'function') {
-    container.innerHTML = getThemeToggleHTML();
-    if (typeof ThemeManager !== 'undefined' && ThemeManager) {
-      ThemeManager.init();
-    }
-  }
-});
+// Add this function to auth.js
+function logoutUser() {
+  AuthAPI.clearSession();
+  document.body.classList.remove('admin-logged-in');
+  window.location.href = 'index.html';
+}
 
-// Also run when login state changes
-document.addEventListener('authChange', function() {
-  updateNavForAuth();
-});
+// Make it global
+window.logoutUser = logoutUser;
 
-// Expose globally
-window.isUserAdmin = isUserAdmin;
+document.addEventListener("DOMContentLoaded", updateNavForAuth);
+
 window.updateNavForAuth = updateNavForAuth;
+window.isUserAdmin = isUserAdmin;

@@ -1020,14 +1020,10 @@ body.auth-page { background: var(--midnight); min-height: 100vh; }
    ADMIN-ONLY NAVIGATION
    ============================================ */
 
-/* Hide Inventory link by default */
 #inventoryNavLink {
-  display: none !important;
-  visibility: hidden !important;
+    display: none;
 }
 
-/* Show Inventory link only when admin is logged in */
 body.admin-logged-in #inventoryNavLink {
-  display: inline !important;
-  visibility: visible !important;
+    display: inline;
 }
