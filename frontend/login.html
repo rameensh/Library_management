@@ -89,6 +89,12 @@ const API_BASE_URL = window.BIBLIOTHECA_API_BASE_URL || "http://localhost:8000";
 const AUTH_TOKEN_KEY = "bibliotheca:token";
 const AUTH_USER_KEY = "bibliotheca:user";
 
+// When admin logs in
+document.body.classList.add('admin-logged-in');
+
+// When admin logs out
+document.body.classList.remove('admin-logged-in');
+
 // ── Auth helpers ──────────────────────────────────────────────
 
 function getToken() {

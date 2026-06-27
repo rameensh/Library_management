@@ -166,3 +166,55 @@ function escapeHTML(str) {
   div.textContent = str ?? "";
   return div.innerHTML;
 }
+
+// auth.js - Add this if not already there
+
+function isUserAdmin() {
+  try {
+    const user = JSON.parse(localStorage.getItem('bibliotheca:user') || '{}');
+    return user.role === 'admin' || user.isAdmin === true;
+  } catch {
+    return false;
+  }
+}
+
+function updateNavForAuth() {
+  const inventoryLink = document.getElementById('inventoryNavLink');
+  if (!inventoryLink) return;
+  
+  const isAdmin = isUserAdmin();
+  console.log('🛡️ Is user admin?', isAdmin);
+  
+  if (isAdmin) {
+    inventoryLink.style.display = '';
+    inventoryLink.style.visibility = 'visible';
+    document.body.classList.add('admin-logged-in');
+  } else {
+    inventoryLink.style.display = 'none';
+    inventoryLink.style.visibility = 'hidden';
+    document.body.classList.remove('admin-logged-in');
+  }
+}
+
+// Run on page load
+document.addEventListener('DOMContentLoaded', function() {
+  updateNavForAuth();
+  
+  // Also handle theme if needed
+  const container = document.getElementById('theme-controls');
+  if (container && typeof getThemeToggleHTML === 'function') {
+    container.innerHTML = getThemeToggleHTML();
+    if (typeof ThemeManager !== 'undefined' && ThemeManager) {
+      ThemeManager.init();
+    }
+  }
+});
+
+// Also run when login state changes
+document.addEventListener('authChange', function() {
+  updateNavForAuth();
+});
+
+// Expose globally
+window.isUserAdmin = isUserAdmin;
+window.updateNavForAuth = updateNavForAuth;

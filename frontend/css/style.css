@@ -1015,3 +1015,19 @@ body.auth-page { background: var(--midnight); min-height: 100vh; }
   .form-row { grid-template-columns: 1fr; }
   .auth-card--wide { max-width: 100%; }
 }
+
+/* ============================================
+   ADMIN-ONLY NAVIGATION
+   ============================================ */
+
+/* Hide Inventory link by default */
+#inventoryNavLink {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+/* Show Inventory link only when admin is logged in */
+body.admin-logged-in #inventoryNavLink {
+  display: inline !important;
+  visibility: visible !important;
+}
