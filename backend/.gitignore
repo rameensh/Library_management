@@ -19,3 +19,6 @@ venv/
 # OS files
 .DS_Store
 Thumbs.db
+
+# backup database file from render
+backend/bibliotheca.sql
